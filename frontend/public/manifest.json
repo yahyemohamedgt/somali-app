@@ -1,0 +1,17 @@
+{
+  "name": "Barashada Somaliga",
+  "short_name": "Somali",
+  "description": "Learn Somali with flashcards and quizzes",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#4f46e5",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
