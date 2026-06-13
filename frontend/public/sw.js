@@ -1,4 +1,4 @@
-const CACHE = 'somali-v1'
+const CACHE = 'somali-v2'
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/', '/manifest.json'])))
