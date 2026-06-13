@@ -1,6 +1,6 @@
 import type { Lesson, LessonDetail } from '@/types'
 
-const API = 'http://localhost:8000'
+const API = 'http://3.238.143.142:8000'
 
 export async function fetchLessons(): Promise<Lesson[]> {
   const res = await fetch(`${API}/lessons`, { cache: 'no-store' })
