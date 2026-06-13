@@ -19,8 +19,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="so" className={`${geist.variable} h-full antialiased`}>
-      <body className="min-h-full bg-gray-50">
+    <html lang="so" className={geist.variable} style={{ height: '100%' }}>
+      <body style={{ minHeight: '100%', background: '#0F0F1A', margin: 0 }}>
         {children}
         <RegisterSW />
       </body>

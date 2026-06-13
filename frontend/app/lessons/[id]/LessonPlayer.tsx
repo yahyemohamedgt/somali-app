@@ -6,13 +6,20 @@ import type { LessonDetail, Word } from '@/types'
 
 type Status = 'idle' | 'correct' | 'wrong'
 
+const CELEBRATIONS = [
+  { so: 'Aad baad u fiicantahay!', en: "You're amazing!"  },
+  { so: 'Waad ku guuleysatay!',    en: 'You succeeded!'   },
+  { so: 'Ku sii wad!',             en: 'Keep it up!'      },
+]
+
 export default function LessonPlayer({ lesson }: { lesson: LessonDetail }) {
   const { words } = lesson
-  const [index, setIndex]     = useState(0)
+  const [index, setIndex]       = useState(0)
   const [selected, setSelected] = useState<string | null>(null)
-  const [status, setStatus]   = useState<Status>('idle')
-  const [score, setScore]     = useState(0)
-  const [done, setDone]       = useState(false)
+  const [status, setStatus]     = useState<Status>('idle')
+  const [score, setScore]       = useState(0)
+  const [done, setDone]         = useState(false)
+  const [msgIndex]              = useState(() => Math.floor(Math.random() * CELEBRATIONS.length))
 
   const current  = words[index]
   const progress = words.length > 0 ? (index / words.length) * 100 : 0
@@ -30,7 +37,7 @@ export default function LessonPlayer({ lesson }: { lesson: LessonDetail }) {
   }
 
   function handleCheck() {
-    if (!selected || status !== 'idle') return
+    if (!selected) return
     if (selected === current.id) {
       setScore(s => s + 1)
       setStatus('correct')
@@ -49,44 +56,77 @@ export default function LessonPlayer({ lesson }: { lesson: LessonDetail }) {
     }
   }
 
-  function optionStyle(opt: Word): string {
-    const base = 'w-full py-4 px-4 rounded-2xl border-2 font-semibold text-base text-left transition-all '
-    if (status === 'idle') {
-      return base + (selected === opt.id
-        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-        : 'border-gray-200 bg-white text-gray-700 hover:border-indigo-300 active:scale-95')
-    }
-    if (opt.id === current.id) return base + 'border-green-500 bg-green-50 text-green-700'
-    if (opt.id === selected)   return base + 'border-red-400 bg-red-50 text-red-600'
-    return base + 'border-gray-100 bg-gray-50 text-gray-300'
-  }
-
-  // ── Completion screen ──────────────────────────────────────────────────────
+  // ── Completion ─────────────────────────────────────────────────────────────
   if (done) {
+    const pct   = words.length > 0 ? score / words.length : 0
+    const stars = pct >= 0.8 ? 3 : pct >= 0.5 ? 2 : 1
+    const xp    = score * 10
+    const msg   = CELEBRATIONS[msgIndex]
+
     return (
-      <div className="flex flex-col h-screen max-w-[390px] mx-auto bg-white">
-        <div className="flex items-center px-4 py-3 border-b border-gray-100">
-          <div className="w-full bg-green-500 h-2.5 rounded-full" />
+      <div style={{
+        backgroundColor: '#0F0F1A',
+        minHeight: '100vh',
+        maxWidth: '390px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        textAlign: 'center',
+      }}>
+        <div style={{ fontSize: '72px', marginBottom: '12px' }}>🎉</div>
+        <div style={{ fontSize: '40px', marginBottom: '16px' }}>
+          {'⭐'.repeat(stars)}{'☆'.repeat(3 - stars)}
+        </div>
+        <div style={{ fontSize: '22px', fontWeight: 900, color: '#ffffff', marginBottom: '6px' }}>
+          {msg.so}
+        </div>
+        <div style={{ fontSize: '14px', color: '#8888aa', marginBottom: '32px' }}>
+          {msg.en}
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-          <div className="text-7xl mb-6">🎉</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-1">Lesson Complete!</h2>
-          <p className="text-gray-400 mb-8">{lesson.title}</p>
-          <div className="bg-gray-50 rounded-3xl px-14 py-6 mb-8 w-full">
-            <p className="text-5xl font-bold text-indigo-600">
-              {score}
-              <span className="text-2xl text-gray-300">/{words.length}</span>
-            </p>
-            <p className="text-gray-400 mt-1 text-sm">correct</p>
-          </div>
-          <Link
-            href="/"
-            className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-base text-center hover:bg-indigo-700 transition-colors"
-          >
-            Back to Lessons
-          </Link>
+        <div style={{
+          backgroundColor: '#1A1A2E',
+          borderRadius: '20px',
+          padding: '20px 40px',
+          marginBottom: '12px',
+          width: '100%',
+        }}>
+          <div style={{ fontSize: '48px', fontWeight: 900, color: '#FFE66D' }}>+{xp}</div>
+          <div style={{ fontSize: '13px', color: '#8888aa', marginTop: '4px' }}>XP earned</div>
         </div>
+
+        <div style={{
+          backgroundColor: '#1A1A2E',
+          borderRadius: '20px',
+          padding: '16px 40px',
+          marginBottom: '32px',
+          width: '100%',
+        }}>
+          <div style={{ fontSize: '36px', fontWeight: 900, color: '#4ECDC4' }}>
+            {score}
+            <span style={{ fontSize: '18px', color: '#555577' }}>/{words.length}</span>
+          </div>
+          <div style={{ fontSize: '13px', color: '#8888aa' }}>correct answers</div>
+        </div>
+
+        <Link href="/" style={{
+          display: 'block',
+          width: '100%',
+          backgroundColor: '#4ECDC4',
+          color: '#0F0F1A',
+          padding: '18px',
+          borderRadius: '16px',
+          fontWeight: 900,
+          fontSize: '16px',
+          textDecoration: 'none',
+          textAlign: 'center',
+        }}>
+          Back to Lessons
+        </Link>
       </div>
     )
   }
@@ -94,70 +134,179 @@ export default function LessonPlayer({ lesson }: { lesson: LessonDetail }) {
   const isAnswered = status !== 'idle'
   const isCorrect  = status === 'correct'
 
-  // ── Lesson screen ──────────────────────────────────────────────────────────
+  // ── Lesson ─────────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-screen max-w-[390px] mx-auto bg-white">
+    <div style={{
+      backgroundColor: '#0F0F1A',
+      height: '100vh',
+      maxWidth: '390px',
+      margin: '0 auto',
+      display: 'flex',
+      flexDirection: 'column',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    }}>
 
-      {/* Fixed header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 shrink-0">
-        <Link href="/" className="text-gray-400 hover:text-gray-600 shrink-0">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '16px 16px 12px',
+        flexShrink: 0,
+      }}>
+        <Link href="/" style={{ color: '#555577', flexShrink: 0, lineHeight: 0 }}>
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </Link>
-        <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
+
+        <div style={{
+          flex: 1,
+          height: '8px',
+          borderRadius: '8px',
+          backgroundColor: '#1A1A2E',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            height: '100%',
+            borderRadius: '8px',
+            backgroundColor: '#4ECDC4',
+            width: `${progress}%`,
+            transition: 'width 0.4s ease',
+          }} />
         </div>
-        <span className="text-xs text-gray-400 font-medium tabular-nums shrink-0">
+
+        <span style={{ fontSize: '12px', fontWeight: 700, color: '#4ECDC4', flexShrink: 0 }}>
           {index + 1}/{words.length}
         </span>
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col px-5 pt-8 pb-4 overflow-hidden">
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '24px 20px 16px',
+        overflow: 'hidden',
+      }}>
+        <div style={{
+          fontSize: '12px',
+          fontWeight: 700,
+          color: '#555577',
+          textTransform: 'uppercase',
+          letterSpacing: '2px',
+          marginBottom: '20px',
+        }}>
           What does this mean?
-        </p>
-        <p className="text-3xl font-bold text-gray-800 mb-8 leading-tight">
-          {current.somali}
-        </p>
+        </div>
 
-        <div className="flex flex-col gap-3">
-          {options.map(opt => (
-            <button
-              key={opt.id}
-              onClick={() => handleSelect(opt)}
-              className={optionStyle(opt)}
-              disabled={isAnswered}
-            >
-              {opt.english}
-            </button>
-          ))}
+        <div style={{
+          fontSize: '48px',
+          fontWeight: 900,
+          color: '#4ECDC4',
+          lineHeight: 1.2,
+          marginBottom: '32px',
+          textAlign: 'center',
+        }}>
+          {current.somali}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {options.map(opt => {
+            const isThisSelected = selected === opt.id
+            const isThisCorrect  = opt.id === current.id
+            const isThisWrong    = isAnswered && isThisSelected && !isThisCorrect
+
+            let bg     = '#1A1A2E'
+            let border = '2px solid #2A2A3E'
+            let color  = '#ffffff'
+            let icon   = ''
+
+            if (status === 'idle') {
+              if (isThisSelected) {
+                border = '2px solid #4ECDC4'
+              }
+            } else {
+              if (isThisCorrect) {
+                bg     = '#00C851'
+                border = '2px solid #00C851'
+                color  = '#ffffff'
+                icon   = '✓'
+              } else if (isThisSelected) {
+                bg     = '#FF4444'
+                border = '2px solid #FF4444'
+                color  = '#ffffff'
+                icon   = '✗'
+              } else {
+                color  = '#444466'
+                border = '2px solid #1A1A2E'
+              }
+            }
+
+            return (
+              <button
+                key={opt.id}
+                onClick={() => handleSelect(opt)}
+                disabled={isAnswered}
+                style={{
+                  backgroundColor: bg,
+                  border,
+                  borderRadius: '16px',
+                  padding: '18px 20px',
+                  color,
+                  fontWeight: 700,
+                  fontSize: '16px',
+                  textAlign: 'left',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: isAnswered ? 'default' : 'pointer',
+                  transition: 'background 0.15s, border-color 0.15s',
+                  animation: isThisWrong ? 'shake 0.35s ease-in-out' : 'none',
+                  width: '100%',
+                }}
+              >
+                <span>{opt.english}</span>
+                {icon && <span style={{ fontSize: '20px' }}>{icon}</span>}
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      {/* Fixed bottom bar */}
-      <div className={`shrink-0 px-5 pt-4 pb-6 transition-colors duration-200 ${
-        isCorrect  ? 'bg-green-50 border-t-2 border-green-200' :
-        status === 'wrong' ? 'bg-red-50 border-t-2 border-red-200' :
-        'bg-white border-t border-gray-100'
-      }`}>
+      {/* Bottom bar */}
+      <div style={{
+        backgroundColor: '#1A1A2E',
+        padding: '16px 20px 32px',
+        flexShrink: 0,
+      }}>
         {isAnswered && (
-          <div className="flex items-start gap-3 mb-4">
-            <span className={`text-xl mt-0.5 ${isCorrect ? 'text-green-500' : 'text-red-500'}`}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px',
+            marginBottom: '16px',
+          }}>
+            <span style={{
+              fontSize: '20px',
+              color: isCorrect ? '#00C851' : '#FF4444',
+              marginTop: '2px',
+            }}>
               {isCorrect ? '✓' : '✗'}
             </span>
             <div>
-              <p className={`font-bold ${isCorrect ? 'text-green-600' : 'text-red-500'}`}>
+              <div style={{
+                fontWeight: 900,
+                fontSize: '16px',
+                color: isCorrect ? '#00C851' : '#FF4444',
+              }}>
                 {isCorrect ? 'Correct!' : 'Incorrect'}
-              </p>
+              </div>
               {!isCorrect && (
-                <p className="text-sm text-gray-500 mt-0.5">
-                  Correct answer: <span className="font-semibold">{current.english}</span>
-                </p>
+                <div style={{ fontSize: '14px', color: '#8888aa', marginTop: '4px' }}>
+                  Answer:{' '}
+                  <span style={{ fontWeight: 700, color: '#ffffff' }}>{current.english}</span>
+                </div>
               )}
             </div>
           </div>
@@ -166,12 +315,21 @@ export default function LessonPlayer({ lesson }: { lesson: LessonDetail }) {
         <button
           onClick={isAnswered ? handleContinue : handleCheck}
           disabled={!selected && !isAnswered}
-          className={`w-full py-4 rounded-2xl font-bold text-base transition-all active:scale-95 ${
-            isCorrect        ? 'bg-green-500 text-white' :
-            status === 'wrong' ? 'bg-red-500 text-white' :
-            selected           ? 'bg-indigo-600 text-white hover:bg-indigo-700' :
-            'bg-gray-100 text-gray-400 cursor-not-allowed'
-          }`}
+          style={{
+            width: '100%',
+            padding: '18px',
+            borderRadius: '16px',
+            border: 'none',
+            fontWeight: 900,
+            fontSize: '16px',
+            cursor: (!selected && !isAnswered) ? 'not-allowed' : 'pointer',
+            backgroundColor: isCorrect          ? '#00C851'
+                           : status === 'wrong' ? '#FF4444'
+                           : selected           ? '#FFE66D'
+                           : '#2A2A3E',
+            color: (isCorrect || status === 'wrong' || selected) ? '#0F0F1A' : '#444466',
+            transition: 'background 0.2s',
+          }}
         >
           {isAnswered ? 'Continue' : 'Check'}
         </button>
