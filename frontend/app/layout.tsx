@@ -6,7 +6,7 @@ import RegisterSW from '@/components/RegisterSW'
 const geist = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Barashada Somaliga',
+  title: 'SomaliNimo',
   description: 'Learn Somali with flashcards and quizzes',
   manifest: '/manifest.json',
 }

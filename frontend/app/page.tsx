@@ -35,7 +35,7 @@ export default async function HomePage() {
       <div className="bg-indigo-600 text-white px-6 pt-14 pb-8">
         <div className="flex items-center gap-3 mb-1">
           <span className="text-3xl">🇸🇴</span>
-          <h1 className="text-2xl font-bold tracking-tight">Barashada Somaliga</h1>
+          <h1 className="text-2xl font-bold tracking-tight">SomaliNimo</h1>
         </div>
         <p className="text-indigo-200 text-sm pl-1">
           {error ? 'Could not load lessons' : `Learn Somali • ${lessons.length} lessons`}
